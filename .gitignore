@@ -1,0 +1,7 @@
+node_modules/
+qa/
+*.tar
+*.tar.gz
+.env
+.env.*
+!.env.example

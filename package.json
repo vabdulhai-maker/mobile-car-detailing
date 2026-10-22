@@ -1,0 +1,15 @@
+{
+  "name": "mobile-car-detailing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Atelier Detail — mobile-first car detailing demonstration website",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
+    "check": "node --check app.js && node --check server.mjs",
+    "test": "node qa.cjs",
+    "prepare:assets": "node prepare-assets.cjs"
+  },
+  "engines": {"node": ">=20"},
+  "devDependencies": {"playwright": "1.62.1", "sharp": "0.35.5"}
+}
