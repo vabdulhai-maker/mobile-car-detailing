@@ -1,75 +1,50 @@
 # Atelier Detail — Mobile Car Detailing
 
-A complete, mobile-first detailing demo for a fictional Austin, Texas business.
+A complete static demonstration website for a fictional automotive detailing business in Austin, Texas.
 
-**Website:** https://vabdulhai-maker.github.io/mobile-car-detailing/
-
-## Open the website
-
-Use the website link above to see the actual website. The GitHub repository displays source files, not a rendered website.
-
-To open a downloaded copy, unzip the complete repository and open `index.html`. Keep `style.css`, `app.js`, and the entire `assets/` folder alongside it. For a local web server, install Node.js 20 or later and run:
-
-```sh
-npm start
-```
-
-Then visit http://127.0.0.1:4173. No dependency installation or build step is needed to view or host the site.
+- Vercel: https://mobile-car-detailing-xi.vercel.app/
+- GitHub Pages: https://vabdulhai-maker.github.io/mobile-car-detailing/
 
 ## Hosting
 
-The homepage is at the repository root. All asset references are relative, so the website supports GitHub Pages project URLs such as `/mobile-car-detailing/`.
+This repository contains ready-to-serve HTML, CSS, JavaScript, and images. It needs no Node server, package installation, build command, or serverless functions.
 
-GitHub Pages settings: **Deploy from a branch → main → / (root)**. The `.nojekyll` file allows GitHub Pages to serve the static files directly.
+The included `vercel.json` explicitly configures static hosting:
 
-For other static hosting providers, select this repository's root directory as the publish directory and leave the build command empty. Upload `index.html`, `style.css`, `app.js`, and `assets/` together.
+| Setting | Value |
+| --- | --- |
+| Framework Preset | Other (`framework: null`) |
+| Root Directory | Repository root |
+| Build Command | Empty; skipped |
+| Install Command | Empty; skipped |
+| Output Directory | `.` |
 
-## Included
+Deploy the latest `main` commit. If an existing Vercel project does not automatically redeploy, select **Redeploy** for the latest commit in its dashboard. An older deployment retains the old server error until the replacement is deployed. Ensure the connected repository is `vabdulhai-maker/mobile-car-detailing` and the root directory is not set to a subfolder.
 
-- Cinematic portrait hero and optimized WebP images.
-- Mobile navigation and persistent booking controls.
-- Service details and vehicle-sensitive package pricing.
-- Seven-step booking flow with validation, add-ons, estimates, and downloadable summaries.
-- Interactive finish comparison, expandable gallery, service areas, FAQs, and contact form.
-- Keyboard accessibility, reduced-motion support, and mobile safe-area spacing.
+For GitHub Pages, use **Deploy from a branch → main → / (root)**. `.nojekyll` tells GitHub to serve the files directly.
 
-## Demo limitations
+For other hosts, upload the complete repository contents into the website's public folder. Keep the `assets/` folder alongside `index.html`.
 
-Atelier Detail is fictional. Prices, contact details, and service areas are illustrative. Photos are AI-created; the finish comparison is simulated. There are no fabricated customer reviews.
+## Open locally
 
-Booking and contact forms save the latest submission in this browser only. No requests, appointments, calls, or payments are sent to a business. The footer's **Demo & privacy** dialog can delete saved demo information.
-
-## Optional tests
-
-```sh
-npm install
-npx playwright install chromium
-npm start
-```
-
-With the server running, use another terminal:
-
-```sh
-npm run check
-npm test
-```
-
-The browser tests cover 320, 360, 375, 390, 393, 412, 430, 768, and 1440 pixel widths, navigation, image loading, package pricing, every booking step, validation, back navigation, downloads, contact messages, and saved-data deletion. Reports and screenshots are saved under `qa/` and are excluded from Git.
-
-To test a hosted copy, set `QA_URL` to its full URL. To use an existing Chrome installation, set `PLAYWRIGHT_CHROME_EXECUTABLE` to its executable path. Physical iOS/Android device testing is not included.
+Download and unzip the repository, then open `index.html` in your browser. Keep all files and the `assets/` folder together.
 
 ## Files
 
-| File | Purpose |
-| --- | --- |
-| `index.html` | Website homepage, sections, and dialogs |
-| `style.css` | Mobile-first styles |
-| `app.js` | Navigation, pricing, forms, and booking flow |
-| `assets/` | All website images and the favicon |
-| `server.mjs` | Optional dependency-free local preview server |
-| `package.json` | Preview and optional test commands |
-| `qa.cjs` | Browser tests |
-| `prepare-assets.cjs` | Optional image optimization helper |
-| `ASSET-PROMPTS.md` | Image provenance and prompts |
+- `index.html`: homepage, sections, and booking dialogs.
+- `style.css`: mobile-first styles.
+- `assets/site.js`: browser-only navigation, pricing, gallery, contact form, and booking logic.
+- `assets/*.webp`: optimized vehicle and service images.
+- `assets/mark.svg`: favicon.
+- `vercel.json`: static Vercel configuration.
+- `ASSET-PROMPTS.md`: image provenance and prompts.
 
-The optimized images are already included. To regenerate them from replacement source images, install the optional dependencies and run `npm run prepare:assets -- path/to/hero.png path/to/services.png`.
+## Demo behavior
+
+The business, prices, service areas, and contact details are fictional. Imagery is AI-created, and the finish comparison is simulated. No customer reviews have been fabricated.
+
+Booking and contact forms save the latest submission in the visitor's browser only. Nothing is sent to a business, no appointment is confirmed, and no payment is collected. Saved information can be deleted from **Demo & privacy** in the footer.
+
+## Validation
+
+The website previously passed browser checks at 320, 360, 375, 390, 393, 412, 430, 768, and 1440 pixel widths. Real iOS and Android devices were not available. This static replacement preserves the website's design and interactions while removing the preview server and development tools from the deployed repository.
