@@ -29,20 +29,19 @@ export function mountWheel() {
   wheel.add(rotor);
   scene.add(wheel);
   scene.add(new THREE.HemisphereLight(0xcbd9ee, 0x15110c, 2.1));
-  const key = new THREE.DirectionalLight(0xffe4b3, 5);
+  const key = new THREE.DirectionalLight(0xf4f1e9, 5);
   key.position.set(-3, 4, 5); scene.add(key);
   const edge = new THREE.DirectionalLight(0xc8ddff, 3.2);
   edge.position.set(4, -1, 3); scene.add(edge);
-  const rimLight = new THREE.DirectionalLight(0xe8ba73, 2);
+  const rimLight = new THREE.DirectionalLight(0xd9e0e8, 2);
   rimLight.position.set(1, 3, -4); scene.add(rimLight);
 
-  const alloy = new THREE.MeshStandardMaterial({ color: 0xaaa59b, metalness: .72, roughness: .26 });
-  const graphite = new THREE.MeshStandardMaterial({ color: 0x333941, metalness: .65, roughness: .34 });
-  const rubber = new THREE.MeshStandardMaterial({ color: 0x101217, metalness: .04, roughness: .87 });
-  const tread = new THREE.MeshStandardMaterial({ color: 0x1c1f24, roughness: .92 });
-  const gold = new THREE.MeshStandardMaterial({ color: 0xd4af68, metalness: .67, roughness: .3 });
-  const steel = new THREE.MeshStandardMaterial({ color: 0x555b63, metalness: .7, roughness: .55 });
-  const dark = new THREE.MeshStandardMaterial({ color: 0x080b0e, roughness: .9 });
+  const alloy = new THREE.MeshStandardMaterial({ color: 0xc1c5c7, metalness: .78, roughness: .19 });
+  const graphite = new THREE.MeshPhysicalMaterial({ color: 0x181c21, metalness: .65,
+    roughness: .23, clearcoat: 1, clearcoatRoughness: .15, side: THREE.DoubleSide });
+  const face = new THREE.MeshPhysicalMaterial({ color: 0x30353a, metalness: .7,
+    roughness: .2, clearcoat: 1, clearcoatRoughness: .12 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x080b0e, roughness: .55 });
   function mesh(geometry, material, parent = rotor) {
     const object = new THREE.Mesh(geometry, material); parent.add(object); return object;
   }
@@ -55,63 +54,54 @@ export function mountWheel() {
     const object = mesh(new THREE.CylinderGeometry(radius, radius, depth, 64), material, parent);
     object.rotation.x = Math.PI / 2; object.position.z = z; return object;
   }
-  // Sidewall profile gives the tire real depth instead of a flat circular graphic.
-  const tire = ring(1.47, .245, 0, rubber);
-  tire.scale.z = 1.35;
-  ring(1.49, .012, .29, tread);
-  ring(1.35, .014, .245, tread);
-  ring(1.49, .012, -.29, tread);
-  const barrel = mesh(new THREE.CylinderGeometry(1.255, 1.255, .5, 80, 1, true), graphite);
+  // Open, deep barrel and machined lips match the reference's bare alloy rim.
+  const profile = [[1.59,-.6],[1.63,-.57],[1.63,-.49],[1.56,-.43],
+    [1.52,-.3],[1.52,.15],[1.57,.28],[1.62,.31],[1.63,.35],[1.59,.37]];
+  const barrel = mesh(new THREE.LatheGeometry(profile.map(([r,z]) => new THREE.Vector2(r,z)), 96), graphite);
   barrel.rotation.x = Math.PI / 2;
-  ring(1.265, .043, .27, alloy);
-  ring(1.265, .035, -.26, graphite);
-  ring(1.19, .015, .28, gold);
-  cylinder(1.09, .055, -.10, steel);
-  ring(.88, .008, -.065, graphite);
-  ring(1.02, .007, -.065, graphite);
+  ring(1.615, .018, .35, alloy);
+  ring(1.57, .009, .32, alloy);
+  ring(1.615, .016, -.58, alloy);
+  ring(1.58, .012, -.47, graphite);
 
-  // Instancing keeps the tread and drilled brake details inexpensive on mobile.
-  const treadBlocks = new THREE.InstancedMesh(new THREE.BoxGeometry(.045, .018, .38), tread, 64);
-  const dummy = new THREE.Object3D();
-  for (let i = 0; i < 64; i++) {
-    const angle = i / 64 * Math.PI * 2;
-    dummy.position.set(Math.cos(angle) * 1.708, Math.sin(angle) * 1.708, 0);
-    dummy.rotation.set(0, 0, angle - Math.PI / 2);
-    dummy.updateMatrix(); treadBlocks.setMatrixAt(i, dummy.matrix);
-  }
-  rotor.add(treadBlocks);
-  const holes = new THREE.InstancedMesh(new THREE.CircleGeometry(.023, 8), dark, 48);
-  for (let i = 0; i < 48; i++) {
-    const angle = i / 24 * Math.PI * 2 + (i >= 24 ? .07 : 0);
-    const radius = i < 24 ? .94 : .79;
-    dummy.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius, -.069);
-    dummy.rotation.set(0, 0, 0); dummy.updateMatrix(); holes.setMatrixAt(i, dummy.matrix);
-  }
-  rotor.add(holes);
-  // Five pairs of tapered, bevelled spokes, with the brake caliper behind them.
+  // Ten angular Y spokes: narrow black faces, bright bevels and a recessed hub.
+  // The front slopes outward with radius to form a genuinely concave wheel face.
   const spokeShape = new THREE.Shape();
-  spokeShape.moveTo(-.07, .24); spokeShape.lineTo(.07, .24);
-  spokeShape.lineTo(.13, 1.19); spokeShape.lineTo(.035, 1.23); spokeShape.closePath();
+  const outline = [[-.04,.24],[.04,.24],[.065,.68],[.265,1.51],
+    [.23,1.575],[.19,1.51],[.015,.86],[-.015,.86],[-.19,1.51],
+    [-.23,1.575],[-.265,1.51],[-.065,.68]];
+  outline.forEach(([x,y],i) => i ? spokeShape.lineTo(x,y) : spokeShape.moveTo(x,y));
+  spokeShape.closePath();
   const spokeGeometry = new THREE.ExtrudeGeometry(spokeShape, {
-    depth: .075, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: .018, bevelThickness: .018
+    depth: .055, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: .008, bevelThickness: .008
   });
-  for (let i = 0; i < 5; i++) {
-    for (const offset of [-.13, .13]) {
-      const spoke = mesh(spokeGeometry, alloy);
-      spoke.rotation.z = i / 5 * Math.PI * 2 + offset;
-      spoke.position.z = .18;
-    }
+  const vertices = spokeGeometry.attributes.position;
+  for (let i = 0; i < vertices.count; i++) {
+    const radius = Math.hypot(vertices.getX(i), vertices.getY(i));
+    vertices.setZ(i, vertices.getZ(i) - .14 + .42 * Math.pow(radius / 1.6, 1.5));
   }
-  const caliper = mesh(new THREE.BoxGeometry(.24, .66, .19), gold, wheel);
-  caliper.position.set(.91, .12, .015); caliper.rotation.z = -.16;
-  cylinder(.30, .12, .23, graphite);
-  cylinder(.19, .035, .31, gold);
-  cylinder(.15, .04, .335, graphite);
+  spokeGeometry.computeVertexNormals();
+  for (let i = 0; i < 10; i++) {
+    const spoke = mesh(spokeGeometry, [face, alloy]);
+    spoke.rotation.z = i / 10 * Math.PI * 2;
+  }
+  cylinder(.29, .12, -.095, graphite);
+  ring(.177, .016, -.012, alloy);
+  cylinder(.16, .045, -.015, graphite);
+  ring(.125, .004, .009, alloy);
+  // A simple inset badge keeps the center understated without copying a logo.
+  const badge = mesh(new THREE.BoxGeometry(.075,.01,.008), alloy);
+  badge.position.set(0, .018, .012); badge.rotation.z = -.45;
+  const badgeLower = mesh(new THREE.BoxGeometry(.075,.01,.008), alloy);
+  badgeLower.position.set(0, -.018, .012); badgeLower.rotation.z = -.45;
   for (let i = 0; i < 5; i++) {
-    const angle = i / 5 * Math.PI * 2;
-    const bolt = cylinder(.038, .04, .32, alloy);
-    bolt.position.x = Math.cos(angle) * .245;
-    bolt.position.y = Math.sin(angle) * .245;
+    const angle = i / 5 * Math.PI * 2 + Math.PI / 10;
+    const socket = cylinder(.043, .025, -.025, dark);
+    const bolt = cylinder(.024, .018, -.004, alloy);
+    for (const detail of [socket, bolt]) {
+      detail.position.x = Math.cos(angle) * .23;
+      detail.position.y = Math.sin(angle) * .23;
+    }
   }
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
@@ -131,7 +121,7 @@ export function mountWheel() {
     const dt = Math.min(64, previous ? time - previous : 16);
     previous = time;
     current = reduce.matches ? target : current + (target - current) * (1 - Math.exp(-dt / 150));
-    wheel.rotation.set(-.16 + Math.sin(current * Math.PI * 2) * .12, -.48 + Math.sin(current * Math.PI * 2 - .4) * .32, -.1);
+    wheel.rotation.set(-.16 + Math.sin(current * Math.PI * 2) * .12, -.62 + Math.sin(current * Math.PI * 2 - .4) * .18, -.1);
     rotor.rotation.z = .18 - current * Math.PI * 2.2;
     wheel.position.y = Math.sin(current * Math.PI * 2) * .18;
     renderer.render(scene, camera);

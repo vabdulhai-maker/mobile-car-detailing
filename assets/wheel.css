@@ -9,7 +9,7 @@ body { isolation: isolate; }
 .wheel-stage {
   position: absolute; width: min(760px, 62vw); aspect-ratio: 1;
   right: -170px; top: 50%; transform: translateY(-46%);
-  opacity: .24;
+  opacity: .32;
   mask-image: linear-gradient(90deg, transparent, #000 28%, #000 90%);
 }
 .wheel-stage::before {
@@ -22,10 +22,10 @@ body { isolation: isolate; }
 .has-wheel .gallery-section { background: #131920bf; }
 .has-wheel .contact-section { background: #181d22bf; }
 @media (max-width: 899px) {
-  .wheel-stage { width: 580px; right: -280px; opacity: .2; }
+  .wheel-stage { width: 580px; right: -220px; opacity: .27; }
 }
 @media (max-width: 599px) {
-  .wheel-stage { width: 410px; right: -230px; top: 58%; opacity: .15; }
+  .wheel-stage { width: 410px; right: -120px; top: 58%; opacity: .24; }
 }
 @media (prefers-reduced-motion: reduce) { .wheel-backdrop { transition: none; } }
 @media print { .wheel-backdrop { display: none; } }
